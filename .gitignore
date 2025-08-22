@@ -2,8 +2,10 @@
     .venv/
 
 
-        *.pyc
-    __pycache__/
+# Python cache
+*.pyc
+__pycache__/
+*/__pycache__/
 
         .vscode/
     .idea/
@@ -13,3 +15,4 @@
         .env
     config.ini
     secrets.json
+
