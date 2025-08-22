@@ -1,0 +1,15 @@
+    venv/
+    .venv/
+
+
+        *.pyc
+    __pycache__/
+
+        .vscode/
+    .idea/
+    *.sublime-project
+    *.sublime-workspace
+
+        .env
+    config.ini
+    secrets.json
