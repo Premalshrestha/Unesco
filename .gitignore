@@ -1,15 +1,33 @@
-    venv/
-    .venv/
+# Virtual environments
+venv/
+.venv/
+
+# Python cache
+*.pyc
+__pycache__/
+*/__pycache__/
+
+# VSCode / IDE settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Django stuff
+db.sqlite3
+media/
+staticfiles/
+
+# Environment / secrets
+.env
+config.ini
+secrets.json
+
+# Logs
+*.log
+
+# System files (Mac/Windows/Linux noise)
+.DS_Store
+Thumbs.db
 
 
-        *.pyc
-    __pycache__/
-
-        .vscode/
-    .idea/
-    *.sublime-project
-    *.sublime-workspace
-
-        .env
-    config.ini
-    secrets.json
