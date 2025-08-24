@@ -1,0 +1,42 @@
+/* General styles */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar */
+.navbar {
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, #28a745, #6cc070);
+    color: white;
+    padding: 100px 20px;
+}
+
+.hero h1 {
+    font-weight: bold;
+    font-size: 2.5rem;
+}
+
+.hero p {
+    font-size: 1.2rem;
+}
+
+/* Feature cards */
+.card {
+    border-radius: 15px;
+    transition: 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.1);
+}
+
+/* Footer */
+footer {
+    margin-top: 50px;
+}
