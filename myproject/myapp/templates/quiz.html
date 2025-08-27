@@ -1,0 +1,501 @@
+{% extends 'base.html' %} {% block title %}Food Quiz - Take Quiz{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="quiz-container">
+    <!-- Quiz Header -->
+    <div class="text-center mb-4">
+      <h1 class="quiz-title">🍽️ Food Knowledge Miscinception Quiz</h1>
+      <p class="text-muted">
+        Test your misnconception related to foods during pregnancy
+      </p>
+    </div>
+
+    <div id="quiz-form">
+      <!-- Enhanced Progress Bar -->
+      <div class="progress-container mb-4">
+        <div class="progress progress-enhanced">
+          <div
+            class="progress-bar progress-bar-animated bg-success"
+            role="progressbar"
+            style="width: 0%; transition: width 0.3s ease"
+            id="progress-bar"
+          >
+            Question 1 of {{ total_questions }}
+          </div>
+        </div>
+        <div class="progress-text text-center mt-2">
+          <small class="text-muted"
+            >Progress: <span id="progress-percentage">0%</span></small
+          >
+        </div>
+      </div>
+
+      <form id="quiz-form-element">
+        {% for question in questions %}
+        <div
+          class="card question-card shadow-sm animate-card"
+          data-question="{{ forloop.counter0 }}"
+          {%
+          if
+          not
+          forloop.first
+          %}style="display: none;"
+          {%
+          endif
+          %}
+        >
+          <!-- Enhanced Card Header -->
+          <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="fas fa-question-circle me-2"></i>
+                Question {{ forloop.counter }} of {{ total_questions }}
+              </h5>
+              <span class="badge bg-light text-primary"
+                >{{ forloop.counter }}/{{ total_questions }}</span
+              >
+            </div>
+          </div>
+
+          <!-- Enhanced Card Body -->
+          <div class="card-body p-4">
+            <div class="question-text-container mb-4">
+              <p class="card-text question-text h4 text-dark">
+                {{ question.question_text }}
+              </p>
+            </div>
+
+            <!-- Enhanced Options -->
+            <div class="options-container">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary option-btn w-100 text-start py-3"
+                    data-question="{{ question.id }}"
+                    data-value="{{ question.option_a }}"
+                  >
+                    <span class="option-letter me-3">A</span>
+                    <span class="option-text">{{ question.option_a }}</span>
+                  </button>
+                </div>
+                <div class="col-md-6">
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary option-btn w-100 text-start py-3"
+                    data-question="{{ question.id }}"
+                    data-value="{{ question.option_b }}"
+                  >
+                    <span class="option-letter me-3">B</span>
+                    <span class="option-text">{{ question.option_b }}</span>
+                  </button>
+                </div>
+                <div class="col-md-6">
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary option-btn w-100 text-start py-3"
+                    data-question="{{ question.id }}"
+                    data-value="{{ question.option_c }}"
+                  >
+                    <span class="option-letter me-3">C</span>
+                    <span class="option-text">{{ question.option_c }}</span>
+                  </button>
+                </div>
+                <div class="col-md-6">
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary option-btn w-100 text-start py-3"
+                    data-question="{{ question.id }}"
+                    data-value="{{ question.option_d }}"
+                  >
+                    <span class="option-letter me-3">D</span>
+                    <span class="option-text">{{ question.option_d }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Enhanced Card Footer -->
+          <div class="card-footer bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+              <button
+                type="button"
+                class="btn btn-outline-secondary px-4"
+                id="prev-btn"
+                {%
+                if
+                forloop.first
+                %}style="display: none;"
+                {%
+                endif
+                %}
+              >
+                <i class="fas fa-chevron-left me-2"></i>Previous
+              </button>
+
+              <div class="quiz-info text-muted">
+                <small>
+                  <i class="fas fa-clock me-1"></i>
+                  Take your time
+                </small>
+              </div>
+
+              <button type="button" class="btn btn-primary px-4" id="next-btn">
+                {% if forloop.last %}
+                <i class="fas fa-check me-2"></i>Submit Quiz {% else %} Next<i
+                  class="fas fa-chevron-right ms-2"
+                ></i>
+                {% endif %}
+              </button>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </form>
+    </div>
+
+    <!-- Enhanced Results Section -->
+    <div id="results" style="display: none">
+      <div class="card shadow-lg border-0 results-card">
+        <div class="card-body text-center p-5">
+          <div class="results-icon mb-4">
+            <i class="fas fa-trophy text-warning" style="font-size: 4rem"></i>
+          </div>
+          <h2 class="text-success mb-4">🎉 Quiz Completed!</h2>
+          <div class="score-display-container mb-4">
+            <div class="score-circle mx-auto mb-3" id="score-display"></div>
+            <p class="h4 text-primary" id="score-text"></p>
+          </div>
+          <div class="results-actions">
+            <a
+              href="#"
+              id="view-results-btn"
+              class="btn btn-primary btn-lg me-3"
+            >
+              <i class="fas fa-chart-bar me-2"></i>View Detailed Results
+            </a>
+            <a
+              href="{% url 'start_quiz' %}"
+              class="btn btn-outline-secondary btn-lg"
+            >
+              <i class="fas fa-redo me-2"></i>Take Quiz Again
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced Styles -->
+<style>
+  .quiz-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .quiz-title {
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-container {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .progress-enhanced {
+    height: 1rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .question-card {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    animation: slideInUp 0.5s ease;
+  }
+
+  .question-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .question-text {
+    line-height: 1.6;
+    color: #2c3e50;
+    font-weight: 500;
+  }
+
+  .option-btn {
+    border: 2px solid #dee2e6;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .option-btn.btn-primary {
+    background: linear-gradient(45deg, #0d6efd, #0056b3);
+    border-color: #0d6efd;
+    color: white;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+  }
+
+  .option-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .option-btn.btn-primary .option-letter {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  .option-text {
+    flex: 1;
+    text-align: left;
+  }
+
+  .results-card {
+    border-radius: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  }
+
+  .score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #28a745, #20c997);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+    }
+    50% {
+      box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+      transform: scale(1.05);
+    }
+    100% {
+      box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+    }
+  }
+
+  .animate-card {
+    animation: slideInUp 0.5s ease;
+  }
+
+  .btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+  }
+
+  .btn-lg {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+  }
+
+  .card-header.bg-primary {
+    background: linear-gradient(45deg, #0d6efd, #0056b3) !important;
+  }
+</style>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      let currentQuestion = 0;
+      const totalQuestions = {{ total_questions }};
+      const questions = document.querySelectorAll('.question-card');
+      const answers = {};
+
+      // Handle option selection with enhanced animations
+      document.addEventListener('click', function(e) {
+          if (e.target.classList.contains('option-btn') || e.target.closest('.option-btn')) {
+              const btn = e.target.classList.contains('option-btn') ? e.target : e.target.closest('.option-btn');
+              const questionId = btn.dataset.question;
+              const value = btn.dataset.value;
+
+              // Remove selection from other options in this question
+              const questionContainer = btn.closest('.question-card');
+              questionContainer.querySelectorAll('.option-btn').forEach(otherBtn => {
+                  otherBtn.classList.remove('btn-primary');
+                  otherBtn.classList.add('btn-outline-primary');
+              });
+
+              // Select this option with animation
+              btn.classList.remove('btn-outline-primary');
+              btn.classList.add('btn-primary');
+
+              // Add a subtle shake animation for feedback
+              btn.style.animation = 'none';
+              setTimeout(() => {
+                  btn.style.animation = 'pulse 0.3s ease';
+              }, 10);
+
+              answers[questionId] = value;
+          }
+      });
+
+      // Handle next/previous navigation
+      document.addEventListener('click', function(e) {
+          if (e.target.id === 'next-btn' || e.target.closest('#next-btn')) {
+              if (currentQuestion < totalQuestions - 1) {
+                  showQuestion(currentQuestion + 1);
+              } else {
+                  submitQuiz();
+              }
+          } else if (e.target.id === 'prev-btn' || e.target.closest('#prev-btn')) {
+              if (currentQuestion > 0) {
+                  showQuestion(currentQuestion - 1);
+              }
+          }
+      });
+
+      function showQuestion(questionIndex) {
+          // Add fade out animation to current question
+          questions[currentQuestion].style.opacity = '0';
+          questions[currentQuestion].style.transform = 'translateX(-30px)';
+
+          setTimeout(() => {
+              questions[currentQuestion].style.display = 'none';
+              questions[questionIndex].style.display = 'block';
+              questions[questionIndex].style.opacity = '0';
+              questions[questionIndex].style.transform = 'translateX(30px)';
+
+              // Animate in new question
+              setTimeout(() => {
+                  questions[questionIndex].style.opacity = '1';
+                  questions[questionIndex].style.transform = 'translateX(0)';
+                  questions[questionIndex].style.transition = 'all 0.3s ease';
+              }, 10);
+
+              currentQuestion = questionIndex;
+              updateProgressBar();
+              updateNavigationButtons();
+          }, 150);
+      }
+
+      function updateProgressBar() {
+          const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+          const progressBar = document.getElementById('progress-bar');
+          const progressPercentage = document.getElementById('progress-percentage');
+
+          progressBar.style.width = progress + '%';
+          progressBar.textContent = `Question ${currentQuestion + 1} of ${totalQuestions}`;
+          progressPercentage.textContent = Math.round(progress) + '%';
+      }
+
+      function updateNavigationButtons() {
+          const prevBtn = document.getElementById('prev-btn');
+          const nextBtn = document.getElementById('next-btn');
+
+          prevBtn.style.display = currentQuestion === 0 ? 'none' : 'block';
+
+          if (currentQuestion === totalQuestions - 1) {
+              nextBtn.innerHTML = '<i class="fas fa-check me-2"></i>Submit Quiz';
+              nextBtn.classList.add('btn-success');
+              nextBtn.classList.remove('btn-primary');
+          } else {
+              nextBtn.innerHTML = 'Next<i class="fas fa-chevron-right ms-2"></i>';
+              nextBtn.classList.add('btn-primary');
+              nextBtn.classList.remove('btn-success');
+          }
+      }
+
+      async function submitQuiz() {
+          // Add loading state
+          const nextBtn = document.getElementById('next-btn');
+          const originalHTML = nextBtn.innerHTML;
+          nextBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+          nextBtn.disabled = true;
+
+          try {
+              const response = await fetch('{% url "submit_quiz" %}', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                  },
+                  body: JSON.stringify({ answers: answers })
+              });
+
+              const data = await response.json();
+
+              if (data.success) {
+                  setTimeout(() => showResults(data), 500); // Small delay for better UX
+              } else {
+                  alert('Error: ' + data.error);
+                  nextBtn.innerHTML = originalHTML;
+                  nextBtn.disabled = false;
+              }
+          } catch (error) {
+              alert('Error submitting quiz: ' + error.message);
+              nextBtn.innerHTML = originalHTML;
+              nextBtn.disabled = false;
+          }
+      }
+
+      function showResults(data) {
+          document.getElementById('quiz-form').style.opacity = '0';
+          setTimeout(() => {
+              document.getElementById('quiz-form').style.display = 'none';
+              document.getElementById('results').style.display = 'block';
+              document.getElementById('results').style.opacity = '0';
+
+              // Animate results in
+              setTimeout(() => {
+                  document.getElementById('results').style.opacity = '1';
+                  document.getElementById('results').style.transition = 'opacity 0.5s ease';
+              }, 10);
+
+              document.getElementById('score-display').textContent = `${data.score}/${data.total}`;
+              document.getElementById('score-text').textContent = `You scored ${data.percentage}%`;
+
+              const viewResultsBtn = document.getElementById('view-results-btn');
+              viewResultsBtn.href = `/results/${data.quiz_id}/`;
+          }, 300);
+      }
+
+      // Initialize progress bar
+      updateProgressBar();
+  });
+</script>
+{% endblock %}

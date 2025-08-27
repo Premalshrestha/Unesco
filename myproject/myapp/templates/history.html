@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz History{% endblock %}
+
+{% block content %}
+<div class="quiz-container">
+    <h1 class="mb-4">Your Quiz History</h1>
+    
+    {% if attempts %}
+        <div class="row">
+            {% for attempt in attempts %}
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Quiz Attempt</h5>
+                        <p class="card-text">
+                            <strong>Score:</strong> {{ attempt.correct_answers }}/{{ attempt.total_questions }} ({{ attempt.score_percentage }}%)<br>
+                            <strong>Date:</strong> {{ attempt.completed_at|date:"F d, Y g:i A" }}
+                        </p>
+                        <a href="{% url 'quiz_results' attempt.id %}" class="btn btn-sm btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <h4>No Quiz History</h4>
+            <p>You haven't taken any quizzes yet. <a href="{% url 'start_quiz' %}">Take your first quiz!</a></p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

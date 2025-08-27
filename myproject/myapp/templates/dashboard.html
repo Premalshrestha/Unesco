@@ -1,0 +1,165 @@
+{% extends 'healthbase.html' %}
+{% block title %}Dashboard - Health Data Extractor{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-white">
+                <i class="fas fa-tachometer-alt me-2"></i>
+                Welcome, {{ user.first_name|default:user.username }}!
+            </h1>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-file-pdf text-danger" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-3 mb-1">{{ total_pdfs }}</h3>
+                <p class="text-muted">Total PDFs</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-check-circle text-success" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-3 mb-1">{{ processed_pdfs }}</h3>
+                <p class="text-muted">Processed PDFs</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-heartbeat text-primary" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-3 mb-1">{{ total_health_records }}</h3>
+                <p class="text-muted">Health Records</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-clock text-warning" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-3 mb-1">{{ total_pdfs|add:"-"|add:processed_pdfs }}</h3>
+                <p class="text-muted">Pending</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'upload_pdfs' %}" class="btn btn-primary w-100 py-3">
+                            <i class="fas fa-upload d-block mb-2" style="font-size: 1.5rem;"></i>
+                            Upload PDFs
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'process_pdfs' %}" class="btn btn-success w-100 py-3">
+                            <i class="fas fa-cogs d-block mb-2" style="font-size: 1.5rem;"></i>
+                            Process PDFs
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'view_health_info' %}" class="btn btn-info w-100 py-3">
+                            <i class="fas fa-chart-line d-block mb-2" style="font-size: 1.5rem;"></i>
+                            View Health Info
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <button class="btn btn-warning w-100 py-3" onclick="window.print()">
+                            <i class="fas fa-print d-block mb-2" style="font-size: 1.5rem;"></i>
+                            Print Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>Recent PDFs</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_pdfs %}
+                <div class="list-group list-group-flush">
+                    {% for pdf in recent_pdfs %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ pdf.original_filename }}</strong>
+                            <br>
+                            <small class="text-muted">{{ pdf.uploaded_at|date:"M d, Y H:i" }}</small>
+                        </div>
+                        <span class="badge bg-{% if pdf.processed %}success{% else %}warning{% endif %}">
+                            {% if pdf.processed %}Processed{% else %}Pending{% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No PDFs uploaded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-heartbeat me-2"></i>Recent Health Data</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_health_data %}
+                <div class="list-group list-group-flush">
+                    {% for health in recent_health_data %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>{{ health.pdf_document.original_filename }}</strong>
+                                <br>
+                                <small class="text-muted">{{ health.extracted_at|date:"M d, Y H:i" }}</small>
+                                {% if health.blood_pressure_systolic %}
+                                <br>
+                                <small class="text-info">
+                                    <i class="fas fa-heartbeat me-1"></i>
+                                    BP: {{ health.blood_pressure_systolic }}/{{ health.blood_pressure_diastolic }}
+                                </small>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'health_detail' health.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No health data extracted yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
