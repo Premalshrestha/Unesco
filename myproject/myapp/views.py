@@ -1,3 +1,4 @@
+
 # views.py
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -340,3 +341,4 @@ def health_data_json(request):
             'success': False,
             'message': 'No health data found'
         })
+

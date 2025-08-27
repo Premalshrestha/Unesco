@@ -1,3 +1,5 @@
+# App-level urls.py keeps routes modular, reusable, and avoids clutter in the main urls.py.
+
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
