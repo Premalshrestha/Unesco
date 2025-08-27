@@ -1,2 +1,195 @@
-<!-- Dashboard ko lai -->
- 
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MotherCare Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <i class="fas fa-heart"></i>
+        MotherCare
+      </a>
+      
+      <ul class="nav-links" id="navLinks">
+        <!-- <li><a href="#dashboard" class="active"><i class="fas fa-chart-line"></i> Dashboard</a></li> -->
+        <li><a href="#profile"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="#pregnancy"><i class="fas fa-baby"></i> Pregnancy</a></li>
+        <li><a href="#nutrition"><i class="fas fa-apple-alt"></i> Nutrition</a></li>
+        <li><a href="#health"><i class="fas fa-heartbeat"></i> Health</a></li>
+        <li><a href="#mental-health"><i class="fas fa-brain"></i> Mental Health</a></li>
+        <li><a href="#baby-growth"><i class="fas fa-child"></i> Baby Growth</a></li>
+        <li><a href="#emergency"><i class="fas fa-phone-alt"></i> Emergency Helps</a></li>
+      </ul>
+
+      <div class="user-profile">
+        <button class="notification-bell">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge">3</span>
+        </button>
+        <div class="profile-avatar">
+          JD
+        </div>
+      </div>
+
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Welcome Section -->
+    <section class="welcome floating">
+      <h2>Welcome back, Sarah! 👋</h2>
+      <p>You're 24 weeks pregnant. Here's how you're doing today.</p>
+    </section>
+
+    <!-- Stats Cards -->
+    <section class="stats">
+      <div class="card pink">
+        <div class="card-header">
+          <div class="icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <span class="value">24w</span>
+        </div>
+        <h3>Pregnancy Week</h3>
+        <p>Second trimester</p>
+      </div>
+
+      <div class="card blue">
+        <div class="card-header">
+          <div class="icon">
+            <i class="fas fa-heartbeat"></i>
+          </div>
+          <span class="value">87%</span>
+        </div>
+        <h3>Wellness Score</h3>
+        <p>Excellent progress</p>
+      </div>
+
+      <div class="card green">
+        <div class="card-header">
+          <div class="icon">
+            <i class="fas fa-weight"></i>
+          </div>
+          <span class="value">+2.1</span>
+        </div>
+        <h3>Weight Gain (kg)</h3>
+        <p>Within healthy range</p>
+      </div>
+
+      <div class="card purple">
+        <div class="card-header">
+          <div class="icon">
+            <i class="fas fa-award"></i>
+          </div>
+          <span class="value">12</span>
+        </div>
+        <h3>Care Points</h3>
+        <p>From baby care activities</p>
+      </div>
+    </section>
+
+    <!-- Activities and Mood -->
+    <section class="grid">
+      <!-- Today's Activities -->
+      <div class="panel">
+        <h3><i class="fas fa-calendar-check"></i> Today's Activities</h3>
+        <div class="activity pink">
+          <div>
+            <p><strong>Morning meditation</strong><br><small>10 minutes of relaxation</small></p>
+          </div>
+          <span class="status">Completed</span>
+        </div>
+        <div class="activity blue">
+          <div>
+            <p><strong>Prenatal vitamins</strong><br><small>Daily supplement taken</small></p>
+          </div>
+          <span class="status">Done</span>
+        </div>
+        <div class="activity orange">
+          <div>
+            <p><strong>Baby care practice</strong><br><small>15 minutes in app</small></p>
+          </div>
+          <span class="status pending">Pending</span>
+        </div>
+      </div>
+
+      <!-- Mood Tracker -->
+      <div class="panel">
+        <h3><i class="fas fa-smile"></i> Mood Tracker</h3>
+        <div class="progress">
+          <div class="progress-info">
+            <span>This week's average</span>
+            <span class="highlight">Great 😊</span>
+          </div>
+          <div class="progress-bar"><div style="width: 85%"></div></div>
+        </div>
+        <div class="mood-metrics">
+          <div class="metric">
+            <span>Energy levels</span>
+            <div class="dots">⭐⭐⭐⭐⭐</div>
+          </div>
+          <div class="metric">
+            <span>Sleep quality</span>
+            <div class="dots">💤💤💤💤💤</div>
+          </div>
+          <div class="metric">
+            <span>Stress levels</span>
+            <div class="dots">😌😌</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="panel">
+      <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+      <div class="actions">
+        <button class="pink">
+          <i class="fas fa-baby"></i>
+          <p>Play Baby Care</p>
+        </button>
+        <button class="purple">
+          <i class="fas fa-brain"></i>
+          <p>Mental Check</p>
+        </button>
+        <button class="green">
+          <i class="fas fa-chart-line"></i>
+          <p>Track Progress</p>
+        </button>
+        <button class="indigo">
+          <i class="fas fa-robot"></i>
+          <p>AI Assistant</p>
+        </button>
+        <button class="pink">
+          <i class="fas fa-utensils"></i>
+          <p>Pregnancy Food Misconception Test</p>
+        </button>
+        <button class="purple">
+          <i class="fas fa-calendar-alt"></i>
+          <p>Schedule Checkup</p>
+        </button>
+        <button class="green">
+          <i class="fas fa-phone-alt"></i>
+          <p>Emergency Help</p>
+        </button>
+        <button class="indigo">
+          <i class="fas fa-book-open"></i>
+          <p>Learn More</p>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/scripts.js" defer></script>
+</body>
+</html>

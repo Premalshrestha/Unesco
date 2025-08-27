@@ -23,7 +23,9 @@ class MotherProfile(models.Model):
 
 
 
-
+#pregnancy food misconception
+class FoodMisconception(models.Model):
+   pass
 
 
 #pregnancy details
@@ -56,3 +58,6 @@ class BabyHealthRecords(models.Model):
     pass
 
 #emergency services
+class EmergencyServices(models.Model):
+    pass
+
