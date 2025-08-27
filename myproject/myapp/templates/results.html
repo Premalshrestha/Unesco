@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Quiz Results
+{% endblock title %}
+
+{% block content %}
+<div class="quiz-container">
+  <div class="text-center mb-4">
+    <h1>Quiz Results</h1>
+    <div class="score-display">
+      {{ quiz_attempt.correct_answers }}/{{ quiz_attempt.total_questions }}
+    </div>
+    <p class="lead">You scored {{ quiz_attempt.score_percentage }}%</p>
+    <small class="text-muted">
+      Completed on {{ quiz_attempt.completed_at|date:"F d, Y \\a\\t g:i A" }}
+    </small>
+  </div>
+
+  <div class="row">
+    {% for answer in user_answers %}
+    <div class="col-md-12 mb-3">
+      <div class="card {% if answer.is_correct %}border-success{% else %}border-danger{% endif %}">
+        <div class="card-header {% if answer.is_correct %}bg-success text-white{% else %}bg-danger text-white{% endif %}">
+          Question {{ forloop.counter }} - {% if answer.is_correct %}Correct{% else %}Incorrect{% endif %}
+        </div>
+        <div class="card-body">
+          <p><strong>Q:</strong> {{ answer.question.question_text }}</p>
+          <p><strong>Your Answer:</strong> {{ answer.selected_answer }}</p>
+          {% if not answer.is_correct %}
+          <p><strong>Correct Answer:</strong> {{ answer.question.correct_answer }}</p>
+          {% endif %}
+          {% if answer.question.explanation %}
+          <p><strong>Explanation:</strong> {{ answer.question.explanation }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="{% url 'start_quiz' %}" class="btn btn-primary">Take Quiz Again</a>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+  </div>
+</div>
+{% endblock content %}

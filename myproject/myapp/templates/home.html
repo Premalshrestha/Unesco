@@ -1,3 +1,30 @@
+
+{% extends 'base.html' %} 
+{% block title %}Food Quiz - Home 
+{% endblock title %}
+{% block content %}
+<div class="quiz-container">
+  <div class="text-center">
+    <h1 class="mb-4">Pregnancy Food Misconceptions Quiz</h1>
+    <p class="lead">Test your knowledge about food safety during pregnancy!</p>
+
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Quiz Information</h5>
+        <p class="card-text">
+          <strong>Total Questions Available:</strong> {{ total_questions }}<br />
+          <strong>Questions per Quiz:</strong> {{ quiz_questions }}<br />
+          <strong>Questions are randomized</strong> on each attempt
+        </p>
+        <a href="{% url 'start_quiz' %}" class="btn btn-primary btn-lg">
+          Start Quiz
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -59,3 +86,4 @@
 <script> src="{static 'js/scripts.js'}"</script>
 </body>
 </html>
+

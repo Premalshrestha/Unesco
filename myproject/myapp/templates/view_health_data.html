@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Health Data</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .data-card {
+            border-left: 4px solid #007bff;
+            transition: transform 0.2s;
+        }
+        .data-card:hover {
+            transform: translateY(-2px);
+        }
+        .pregnancy-card { border-left-color: #e83e8c; }
+        .health-card { border-left-color: #28a745; }
+        .stress-card { border-left-color: #fd7e14; }
+        .data-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #495057;
+        }
+        .no-data {
+            color: #6c757d;
+            font-style: italic;
+        }
+        .last-updated {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-chart-line"></i> My Health Dashboard</h2>
+                    <a href="{% url 'upload_document' %}" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload New Document
+                    </a>
+                </div>
+
+                {% if user_data %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Last updated: {{ user_data.last_updated|date:"M d, Y H:i" }}
+                    </div>
+
+                    <!-- Pregnancy Data -->
+                    <div class="card data-card pregnancy-card mb-4">
+                        <div class="card-header">
+                            <h5><i class="fas fa-baby"></i> Pregnancy Data</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Pregnancy Week</small>
+                                        <div class="data-value">
+                                            {% if user_data.pregnancy_week %}
+                                                {{ user_data.pregnancy_week }} weeks
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Due Date</small>
+                                        <div class="data-value">
+                                            {% if user_data.due_date %}
+                                                {{ user_data.due_date|date:"M d, Y" }}
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Fetal Heart Rate</small>
+                                        <div class="data-value">
+                                            {% if user_data.fetal_heart_rate %}
+                                                {{ user_data.fetal_heart_rate }} bpm
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Fetal Weight</small>
+                                        <div class="data-value">
+                                            {% if user_data.fetal_weight %}
+                                                {{ user_data.fetal_weight }} g
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Morning Sickness</small>
+                                        <div class="data-value">
+                                            {% if user_data.morning_sickness is not None %}
+                                                {% if user_data.morning_sickness %}
+                                                    <span class="text-warning">Yes</span>
+                                                {% else %}
+                                                    <span class="text-success">No</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Gestational Diabetes</small>
+                                        <div class="data-value">
+                                            {% if user_data.gestational_diabetes is not None %}
+                                                {% if user_data.gestational_diabetes %}
+                                                    <span class="text-danger">Yes</span>
+                                                {% else %}
+                                                    <span class="text-success">No</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Previous Pregnancies</small>
+                                        <div class="data-value">
+                                            {{ user_data.previous_pregnancies|default:"0" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Health Data -->
+                    <div class="card data-card health-card mb-4">
+                        <div class="card-header">
+                            <h5><i class="fas fa-heartbeat"></i> Health Vitals</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Blood Pressure</small>
+                                        <div class="data-value">
+                                            {% if user_data.systolic_pressure and user_data.diastolic_pressure %}
+                                                {{ user_data.systolic_pressure }}/{{ user_data.diastolic_pressure }} mmHg
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Heart Rate</small>
+                                        <div class="data-value">
+                                            {% if user_data.heart_rate %}
+                                                {{ user_data.heart_rate }} bpm
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Body Temperature</small>
+                                        <div class="data-value">
+                                            {% if user_data.body_temperature %}
+                                                {{ user_data.body_temperature }}°F
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Weight</small>
+                                        <div class="data-value">
+                                            {% if user_data.weight %}
+                                                {{ user_data.weight }} kg
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">BMI</small>
+                                        <div class="data-value">
+                                            {% if user_data.bmi %}
+                                                {{ user_data.bmi|floatformat:1 }}
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Hemoglobin</small>
+                                        <div class="data-value">
+                                            {% if user_data.hemoglobin %}
+                                                {{ user_data.hemoglobin }} g/dL
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Blood Sugar (Fasting)</small>
+                                        <div class="data-value">
+                                            {% if user_data.blood_sugar_fasting %}
+                                                {{ user_data.blood_sugar_fasting }} mg/dL
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Cholesterol Total</small>
+                                        <div class="data-value">
+                                            {% if user_data.cholesterol_total %}
+                                                {{ user_data.cholesterol_total }} mg/dL
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stress Data -->
+                    <div class="card data-card stress-card mb-4">
+                        <div class="card-header">
+                            <h5><i class="fas fa-brain"></i> Stress & Mental Health</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Stress Level</small>
+                                        <div class="data-value">
+                                            {% if user_data.stress_level %}
+                                                <span class="badge bg-{% if user_data.stress_level == 'low' %}success{% elif user_data.stress_level == 'medium' %}warning{% else %}danger{% endif %} fs-6">
+                                                    {{ user_data.stress_level|title }}
+                                                </span>
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Anxiety Score</small>
+                                        <div class="data-value">
+                                            {% if user_data.anxiety_score %}
+                                                {{ user_data.anxiety_score }}/10
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Depression Score</small>
+                                        <div class="data-value">
+                                            {% if user_data.depression_score %}
+                                                {{ user_data.depression_score }}/10
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Sleep Hours</small>
+                                        <div class="data-value">
+                                            {% if user_data.sleep_hours %}
+                                                {{ user_data.sleep_hours }} hours
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Sleep Disturbances</small>
+                                        <div class="data-value">
+                                            {% if user_data.sleep_disturbances is not None %}
+                                                {% if user_data.sleep_disturbances %}
+                                                    <span class="text-warning">Yes</span>
+                                                {% else %}
+                                                    <span class="text-success">No</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Work Stress</small>
+                                        <div class="data-value">
+                                            {% if user_data.work_stress %}
+                                                {{ user_data.work_stress|title }}
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="border p-3 rounded">
+                                        <small class="text-muted">Cortisol Levels</small>
+                                        <div class="data-value">
+                                            {% if user_data.cortisol_levels %}
+                                                {{ user_data.cortisol_levels }} μg/dL
+                                            {% else %}
+                                                <span class="no-data">Not available</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% else %}
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                        <h4>No Health Data Available</h4>
+                        <p>You haven't uploaded any health documents yet. Upload your first PDF document to start tracking your health data.</p>
+                        <a href="{% url 'upload_document' %}" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Upload Your First Document
+                        </a>
+                    </div>
+                {% endif %}
+
+                <!-- Document Upload History -->
+                {% if uploaded_docs %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-history"></i> Upload History</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Document Name</th>
+                                        <th>Upload Date</th>
+                                        <th>Status</th>
+                                        <th>Data Extracted</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for doc in uploaded_docs %}
+                                    <tr>
+                                        <td>
+                                            <i class="fas fa-file-pdf text-danger"></i>
+                                            {{ doc.original_filename }}
+                                        </td>
+                                        <td>{{ doc.upload_date|date:"M d, Y H:i" }}</td>
+                                        <td>
+                                            {% if doc.processed %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check"></i> Processed
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning">
+                                                    <i class="fas fa-clock"></i> Processing
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if doc.extracted_data %}
+                                                <button class="btn btn-sm btn-outline-info" onclick="showExtractedData('{{ doc.id }}')">
+                                                    <i class="fas fa-eye"></i> View Data
+                                                </button>
+                                            {% else %}
+                                                <span class="text-muted">No data</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for showing extracted data -->
+    <div class="modal fade" id="extractedDataModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Extracted Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="extractedDataContent">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showExtractedData(docId) {
+            // This would fetch and display the extracted data for a specific document
+            // For now, we'll show a placeholder
+            document.getElementById('extractedDataContent').innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading extracted data...</p>
+                </div>
+            `;
+            
+            const modal = new bootstrap.Modal(document.getElementById('extractedDataModal'));
+            modal.show();
+            
+            // Here you would make an AJAX call to fetch the specific document's extracted data
+            setTimeout(() => {
+                document.getElementById('extractedDataContent').innerHTML = `
+                    <div class="alert alert-info">
+                        <strong>Note:</strong> This would show the specific data extracted from document ID: ${docId}
+                    </div>
+                    <p>The extracted data from this document would be displayed here in a formatted way.</p>
+                `;
+            }, 1000);
+        }
+
+        // Auto-refresh data every 30 seconds if processing documents exist
+        {% if uploaded_docs %}
+            let hasProcessingDocs = false;
+            {% for doc in uploaded_docs %}
+                {% if not doc.processed %}
+                    hasProcessingDocs = true;
+                {% endif %}
+            {% endfor %}
+            
+            if (hasProcessingDocs) {
+                setTimeout(() => {
+                    location.reload();
+                }, 30000);
+            }
+        {% endif %}
+    </script>
+</body>
+</html>
