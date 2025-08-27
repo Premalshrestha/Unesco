@@ -32,4 +32,7 @@ secrets.json
 .DS_Store
 Thumbs.db
 
-
+#migrations
+**/migrations/*.py
+!**/migrations/__init__.py
+**/migrations/*.pyc
