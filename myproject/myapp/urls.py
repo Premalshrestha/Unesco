@@ -1,3 +1,4 @@
+
 # App-level urls.py keeps routes modular, reusable, and avoids clutter in the main urls.py.
 
 from django.urls import path
@@ -18,7 +19,5 @@ urlpatterns = [
     path('view-health-data/', views.view_health_data, name='view_health_data'),
     path('health-data-json/', views.health_data_json, name='health_data_json'),
 
-
-   
 
 ]
