@@ -22,10 +22,7 @@ class Question(models.Model):
     
     @classmethod
     def get_random_questions(cls, count=10):
-        questions = list(cls.objects.all())
-        if len(questions) >= count:
-            return random.sample(questions, count)
-        return questions
+        return cls.objects.order_by("?")[:count]
 
 class QuizAttempt(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -124,3 +121,159 @@ class BabyGrowthTracking(models.Model):
 
 class BabyHealthRecords(models.Model):
     pass
+
+class LifestyleQuestion(models.Model):
+    question_text= models.CharField(max_length=255)
+    correct_answer= models.CharField(max_length=255)
+    option_a= models.CharField(max_length=255, blank=True)
+    option_b= models.CharField(max_length=255, blank=True)
+    option_c= models.CharField(max_length=255, blank=True)
+    option_d= models.CharField(max_length=255, blank=True)
+    explanation=models.CharField(blank=True)
+    created_at= models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.question_text[:50]+ "......."
+    
+    @classmethod
+    def lifestyle_random_question(cls, count=10):
+        return cls.objects.order_by("?")[:count]
+    
+
+# models.py
+from django.db import models
+from django.contrib.auth.models import User
+from django.urls import reverse
+from django.utils import timezone
+
+class UserProfile(models.Model):
+    """Extend User model to add role information"""
+    USER_TYPES = [
+        ('user', 'Regular User'),
+        ('consultant', 'Consultant'),
+    ]
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user_type = models.CharField(max_length=20, choices=USER_TYPES, default='user')
+    bio = models.TextField(max_length=500, blank=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.user.username} ({self.get_user_type_display()})"
+
+class Category(models.Model):
+    """Categories for organizing discussions"""
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    slug = models.SlugField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name_plural = "Categories"
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
+class Discussion(models.Model):
+    """Main discussion post"""
+    PRIORITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('urgent', 'Urgent'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('open', 'Open'),
+        ('closed', 'Closed'),
+        ('solved', 'Solved'),
+    ]
+    
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='discussions')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='discussions')
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='open')
+    tags = models.CharField(max_length=200, blank=True, help_text="Comma-separated tags")
+    views = models.PositiveIntegerField(default=0)
+    is_pinned = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-is_pinned', '-created_at']
+    
+    def __str__(self):
+        return self.title
+    
+    def get_absolute_url(self):
+        return reverse('discussion_detail', kwargs={'pk': self.pk})
+    
+    def get_tags_list(self):
+        """Return tags as a list"""
+        if self.tags:
+            return [tag.strip() for tag in self.tags.split(',')]
+        return []
+    
+    def reply_count(self):
+        """Get total number of replies"""
+        return self.replies.count()
+    
+    def latest_reply(self):
+        """Get the latest reply"""
+        return self.replies.order_by('-created_at').first()
+
+class Reply(models.Model):
+    """Replies to discussions"""
+    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='replies')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='replies')
+    content = models.TextField()
+    parent_reply = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='child_replies')
+    is_solution = models.BooleanField(default=False)
+    is_consultant_reply = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['created_at']
+    
+    def __str__(self):
+        return f"Reply to {self.discussion.title} by {self.author.username}"
+    
+    def save(self, *args, **kwargs):
+        # Automatically set is_consultant_reply based on user type
+        if hasattr(self.author, 'userprofile'):
+            self.is_consultant_reply = self.author.userprofile.user_type == 'consultant'
+        super().save(*args, **kwargs)
+
+class Vote(models.Model):
+    """Voting system for replies"""
+    VOTE_CHOICES = [
+        (1, 'Upvote'),
+        (-1, 'Downvote'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    reply = models.ForeignKey(Reply, on_delete=models.CASCADE, related_name='votes')
+    vote_type = models.IntegerField(choices=VOTE_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'reply']
+    
+    def __str__(self):
+        return f"{self.user.username} {'upvoted' if self.vote_type == 1 else 'downvoted'} {self.reply}"
+
+class Bookmark(models.Model):
+    """Bookmarking system for discussions"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='bookmarks')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'discussion']
+    
+    def __str__(self):
+        return f"{self.user.username} bookmarked {self.discussion.title}"

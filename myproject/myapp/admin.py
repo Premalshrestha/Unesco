@@ -3,7 +3,10 @@ from django.contrib import admin
 
 from django.contrib import admin
 
-from .models import Question, QuizAttempt, UserAnswer
+from .models import Question, QuizAttempt, UserAnswer, LifestyleQuestion
+
+@admin.register(LifestyleQuestion)
+
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
