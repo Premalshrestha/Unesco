@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Discussion Forum</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1><i class="fas fa-comments"></i> Discussion Forum</h1>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'create_discussion' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Discussion
+                </a>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search discussions...">
+                    </div>
+                    <div class="col-md-2">
+                        <select name="category" class="form-control">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category.slug }}" {% if category.slug == current_category %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="status" class="form-control">
+                            <option value="">All Status</option>
+                            <option value="open" {% if current_status == 'open' %}selected{% endif %}>Open</option>
+                            <option value="solved" {% if current_status == 'solved' %}selected{% endif %}>Solved</option>
+                            <option value="closed" {% if current_status == 'closed' %}selected{% endif %}>Closed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="user_type" class="form-control">
+                            <option value="">All Users</option>
+                            <option value="user" {% if current_user_type == 'user' %}selected{% endif %}>Regular Users</option>
+                            <option value="consultant" {% if current_user_type == 'consultant' %}selected{% endif %}>Consultants</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sorting Options -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <strong>{{ page_obj.paginator.count }}</strong> discussion{{ page_obj.paginator.count|pluralize }}
+            </div>
+            <div class="btn-group" role="group">
+                <a href="?{% if query %}q={{ query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}sort=latest" 
+                   class="btn btn-sm {% if current_sort == 'latest' %}btn-primary{% else %}btn-outline-primary{% endif %}">Latest</a>
+                <a href="?{% if query %}q={{ query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}sort=popular" 
+                   class="btn btn-sm {% if current_sort == 'popular' %}btn-primary{% else %}btn-outline-primary{% endif %}">Popular</a>
+                <a href="?{% if query %}q={{ query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}sort=replies" 
+                   class="btn btn-sm {% if current_sort == 'replies' %}btn-primary{% else %}btn-outline-primary{% endif %}">Most Replies</a>
+            </div>
+        </div>
+
+        <!-- Discussion List -->
+        <div class="row">
+            {% for discussion in page_obj %}
+                <div class="col-12 mb-3">
+                    <div class="card {% if discussion.is_pinned %}border-warning{% endif %}">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center mb-2">
+                                        {% if discussion.is_pinned %}
+                                            <i class="fas fa-thumbtack text-warning me-2"></i>
+                                        {% endif %}
+                                        <h5 class="card-title mb-0">
+                                            <a href="{{ discussion.get_absolute_url }}" class="text-decoration-none">
+                                                {{ discussion.title }}
+                                            </a>
+                                        </h5>
+                                        <span class="badge bg-{{ discussion.status|default:'secondary' }} ms-2">
+                                            {{ discussion.get_status_display }}
+                                        </span>
+                                    </div>
+                                    
+                                    <p class="card-text text-muted">
+                                        {{ discussion.content|truncatewords:20 }}
+                                    </p>
+                                    
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-muted me-3">
+                                            <i class="fas fa-folder"></i> {{ discussion.category.name }}
+                                        </small>
+                                        <small class="text-muted me-3">
+                                            <i class="fas fa-clock"></i> {{ discussion.created_at|timesince }} ago
+                                        </small>
+                                        {% if discussion.get_tags_list %}
+                                            <div class="d-inline">
+                                                {% for tag in discussion.get_tags_list %}
+                                                    <span class="badge bg-light text-dark me-1"># {{ tag }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div class="fw-bold">{{ discussion.reply_count }}</div>
+                                            <small class="text-muted">Replies</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fw-bold">{{ discussion.views }}</div>
+                                            <small class="text-muted">Views</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="priority-badge priority-{{ discussion.priority }}">
+                                                {{ discussion.get_priority_display }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h4>No discussions found</h4>
+                        <p class="text-muted">Try adjusting your search criteria or create a new discussion.</p>
+                        <a href="{% url 'create_discussion' %}" class="btn btn-primary">Create Discussion</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <style>
+        .priority-badge {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .priority-low { background-color: #d4edda; color: #155724; }
+        .priority-medium { background-color: #fff3cd; color: #856404; }
+        .priority-high { background-color: #f8d7da; color: #721c24; }
+        .priority-urgent { background-color: #dc3545; color: white; }
+    </style>
+</body>
+</html>
