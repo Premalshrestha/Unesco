@@ -268,14 +268,4 @@ class Vote(models.Model):
     def __str__(self):
         return f"{self.user.username} {'upvoted' if self.vote_type == 1 else 'downvoted'} {self.reply}"
 
-class Bookmark(models.Model):
-    """Bookmarking system for discussions"""
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='bookmarks')
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        unique_together = ['user', 'discussion']
-    
-    def __str__(self):
-        return f"{self.user.username} bookmarked {self.discussion.title}"
+

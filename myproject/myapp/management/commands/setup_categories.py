@@ -33,8 +33,8 @@ class Command(BaseCommand):
             
             
             {
-                'name': 'Education',
-                'slug': 'education',
+                'name': 'Pregnancy',
+                'slug': 'pregnancy',
                 'description': 'Learning resources and educational discussions'
             }
         ]

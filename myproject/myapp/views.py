@@ -353,8 +353,11 @@ from django.http import JsonResponse, HttpResponseForbidden
 from django.db.models import Q, Count, Prefetch
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
-from .models import Discussion, Reply, Category, Vote, Bookmark, UserProfile
+from .models import Discussion, Reply, Category, Vote, UserProfile
 from .forms import DiscussionForm, ReplyForm
+
+def home(request):
+    return render(request, 'dashboardfinal.html', {})
 
 def discussion_list(request):
     """Main discussion list with search and filtering"""
@@ -449,12 +452,6 @@ def discussion_detail(request, pk):
     parent_replies = replies.filter(parent_reply=None).order_by('-is_solution', 'created_at')
     
     # Check if user has bookmarked this discussion
-    is_bookmarked = False
-    if request.user.is_authenticated:
-        is_bookmarked = Bookmark.objects.filter(
-            user=request.user, 
-            discussion=discussion
-        ).exists()
     
     # Reply form
     reply_form = ReplyForm()
@@ -463,7 +460,7 @@ def discussion_detail(request, pk):
         'discussion': discussion,
         'replies': parent_replies,
         'reply_form': reply_form,
-        'is_bookmarked': is_bookmarked,
+        
     }
     
     return render(request, 'discussion_detail.html', context)
@@ -509,106 +506,6 @@ def add_reply(request, discussion_pk):
     
     return redirect('discussion_detail', pk=discussion_pk)
 
-@login_required
-@require_POST
-def vote_reply(request, reply_pk):
-    """Vote on a reply (AJAX endpoint)"""
-    reply = get_object_or_404(Reply, pk=reply_pk)
-    vote_type = int(request.POST.get('vote_type'))  # 1 for upvote, -1 for downvote
-    
-    if vote_type not in [1, -1]:
-        return JsonResponse({'error': 'Invalid vote type'}, status=400)
-    
-    # Get or create vote
-    vote, created = Vote.objects.get_or_create(
-        user=request.user,
-        reply=reply,
-        defaults={'vote_type': vote_type}
-    )
-    
-    if not created:
-        if vote.vote_type == vote_type:
-            # Remove vote if clicking the same vote type
-            vote.delete()
-            action = 'removed'
-        else:
-            # Change vote type
-            vote.vote_type = vote_type
-            vote.save()
-            action = 'changed'
-    else:
-        action = 'added'
-    
-    # Calculate new vote score
-    vote_score = reply.votes.filter(vote_type=1).count() - reply.votes.filter(vote_type=-1).count()
-    
-    return JsonResponse({
-        'success': True,
-        'action': action,
-        'vote_score': vote_score,
-        'vote_type': vote_type if action != 'removed' else None
-    })
-
-@login_required
-@require_POST
-def mark_as_solution(request, reply_pk):
-    """Mark a reply as solution (only discussion author or consultants can do this)"""
-    reply = get_object_or_404(Reply, pk=reply_pk)
-    discussion = reply.discussion
-    
-    # Check permissions
-    is_author = discussion.author == request.user
-    is_consultant = (hasattr(request.user, 'userprofile') and 
-                    request.user.userprofile.user_type == 'consultant')
-    
-    if not (is_author or is_consultant):
-        return HttpResponseForbidden("You don't have permission to mark solutions.")
-    
-    # Toggle solution status
-    reply.is_solution = not reply.is_solution
-    reply.save()
-    
-    # Update discussion status if marked as solution
-    if reply.is_solution:
-        discussion.status = 'solved'
-        discussion.save()
-        messages.success(request, 'Reply marked as solution!')
-    else:
-        # Check if there are other solutions, if not, mark as open
-        if not discussion.replies.filter(is_solution=True).exists():
-            discussion.status = 'open'
-            discussion.save()
-        messages.success(request, 'Solution mark removed!')
-    
-    return redirect('discussion_detail', pk=discussion.pk)
-
-@login_required
-@require_POST
-def toggle_bookmark(request, discussion_pk):
-    """Bookmark/unbookmark a discussion"""
-    discussion = get_object_or_404(Discussion, pk=discussion_pk)
-    bookmark, created = Bookmark.objects.get_or_create(
-        user=request.user,
-        discussion=discussion
-    )
-    
-    if not created:
-        bookmark.delete()
-        bookmarked = False
-        message = 'Bookmark removed!'
-    else:
-        bookmarked = True
-        message = 'Discussion bookmarked!'
-    
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return JsonResponse({
-            'success': True,
-            'bookmarked': bookmarked,
-            'message': message
-        })
-    else:
-        messages.success(request, message)
-        return redirect('discussion_detail', pk=discussion_pk)
 
 @login_required
 def my_discussions(request):
@@ -623,20 +520,7 @@ def my_discussions(request):
     
     return render(request, 'my_discussions.html', {'page_obj': page_obj})
 
-@login_required
-def bookmarked_discussions(request):
-    """User's bookmarked discussions"""
-    bookmarks = Bookmark.objects.filter(user=request.user).select_related(
-        'discussion', 'discussion__author', 'discussion__category'
-    ).annotate(
-        reply_count=Count('discussion__replies')
-    ).order_by('-created_at')
-    
-    paginator = Paginator(bookmarks, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    return render(request, 'bookmarked_discussions.html', {'page_obj': page_obj})
+
 
 def category_discussions(request, slug):
     """Discussions in a specific category"""

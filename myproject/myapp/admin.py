@@ -123,7 +123,7 @@ admin.site.register(BabyHealthRecords)
 
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import UserProfile, Category, Discussion, Reply, Vote, Bookmark
+from .models import UserProfile, Category, Discussion, Reply, Vote
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
@@ -219,15 +219,3 @@ class VoteAdmin(admin.ModelAdmin):
         return f"{obj.reply.discussion.title[:30]}..."
     get_reply_discussion.short_description = 'Discussion'
 
-@admin.register(Bookmark)
-class BookmarkAdmin(admin.ModelAdmin):
-    list_display = ['user', 'get_discussion_title', 'created_at']
-    list_filter = ['created_at']
-    search_fields = ['user__username', 'discussion__title']
-    
-    def get_discussion_title(self, obj):
-        return format_html(
-            '<a href="/admin/discussions/discussion/{}/change/">{}</a>',
-            obj.discussion.id, obj.discussion.title
-        )
-    get_discussion_title.short_description = 'Discussion'
